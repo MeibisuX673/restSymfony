@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+
+  db:
+    image: mysql:8.0
+    container_name: db
+    networks:
+      - php
+    environment:
+      MYSQL_ROOT_PASSWORD: 'toor'
+      MYSQL_DATABASE: 'base'
+    ports:
+      - 3305:3306
+    volumes:
+      - ./docker/database:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+    restart: always
+
+  php:
+    build:
+      context: ./php
+    container_name: symfony
+    networks:
+      - php
+    volumes:
+      - ./:/var/app
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    networks:
+      - php
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./public:/var/app/public:ro
+    ports:
+      - 80:80
+    depends_on:
+      db:
+        condition: service_healthy
+      php:
+        condition: service_started
+    restart: always
+
+  mailhog:
+    container_name: mailhog
+    image: mailhog/mailhog:latest
+    restart: always
+    networks:
+      - php
+    ports:
+      - 2025:1025
+      - 9025:8025
+
+
+
+networks:
+  php:
+    name: 'symfony'

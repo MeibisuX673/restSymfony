@@ -1,0 +1,21 @@
+App\Entity\User:
+  user_test:
+    email: 'test@test.com'
+    firstName: 'Meibisu'
+    lastName: 'X673'
+    password: 'test'
+
+App\Entity\Brand:
+  brand_test:
+    name: 'Holli'
+    user: '@user_test'
+
+App\Entity\Product:
+  product_test{1..10}:
+    name: <name()>
+    price: <randomNumber(3)>
+    visible: <boolean()>
+    amount: <randomNumber(3)>
+    timesViewed: <randomNumber(3)>
+    dateCreate: <dateTimeBetween('-1 week', '+1 week')>
+    brand: '@brand_test'

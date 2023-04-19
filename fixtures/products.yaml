@@ -1,0 +1,9 @@
+App\Entity\Product:
+  product_{1..10}:
+    name: <name()>
+    price: <randomNumber(3)>
+    visible: <boolean()>
+    amount: <randomNumber(3)>
+    timesViewed: <randomNumber(3)>
+    dateCreate: <dateTimeBetween('-1 week', '+1 week')>
+    brand: '@brand_*'
