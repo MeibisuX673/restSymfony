@@ -22,12 +22,10 @@ class BaseEntity
 
     #[Groups([self::GET_MANY_BASE,self::GET_ONE_BASE])]
     #[ORM\Column(type: Types::DATETIME_MUTABLE,nullable: true)]
-    #[Assert\DateTime(format: 'Y-m-d H:i:s')]
     public \DateTimeInterface $dateCreate;
 
     #[Groups([self::GET_MANY_BASE,self::GET_ONE_BASE])]
     #[ORM\Column(type: Types::DATETIME_MUTABLE,nullable: true)]
-    #[Assert\DateTime(format: 'Y-m-d H:i:s')]
     public \DateTimeInterface $dateUpdate;
 
     public function getId()

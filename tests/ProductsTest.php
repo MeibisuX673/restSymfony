@@ -6,18 +6,17 @@ namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use App\Entity\Product;
+use App\Entity\User;
 use Hautelook\AliceBundle\PhpUnit\RecreateDatabaseTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ProductsTest extends ApiTestCase
+class ProductsTest extends AbstractTest
 {
 
-    use RecreateDatabaseTrait;
+    public function testGetCollectionAsUser(){
 
-    public function testGetCollection(){
-
-        $response = static::createClient()->request(Request::METHOD_GET,'/api/products');
+        $this->createClientWithCredentials()->request(Request::METHOD_GET,'/api/products?visible=true');
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
@@ -27,21 +26,23 @@ class ProductsTest extends ApiTestCase
             "@context"=>"/api/contexts/Product",
             "@id"=> "/api/products",
             "@type"=> "hydra:Collection",
-            "hydra:totalItems"=> 50
         ]);
 
-        $this->assertCount(30,$response->toArray()['hydra:member']);
-
-        $this->assertMatchesResourceItemJsonSchema(Product::class);
+        $this->assertMatchesResourceCollectionJsonSchema(Product::class);
 
     }
 
-    public function testCreate(){
+    public function testCreateAsUser(){
 
-        $response =  static::createClient()->request(Request::METHOD_POST,'/api/products',[
+        $user = $this->getUser();
+
+        $response =  $this->createClientWithCredentials()->request(Request::METHOD_POST,'/api/products',[
             'json'=>[
-                'name'=>'testCreate',
-                'brand'=>'/api/brands/9'
+                'name'=> 'testCreate',
+                'brand'=> '/api/brands/' . $user->brand->getId(),
+                'price'=> 0,
+                'visible'=> true,
+                'amount'=> 0,
             ]
         ]);
 
@@ -50,9 +51,12 @@ class ProductsTest extends ApiTestCase
         $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
 
         $this->assertJsonContains([
-            "@context"=>"/api/contexts/Product",
-            "@type"=> "Product",
-            "name"=> "testCreate"
+            '@context'=>'/api/contexts/Product',
+            '@type'=> 'Product',
+            'name'=> 'testCreate',
+            'price'=> 0,
+            'visible'=> true,
+            'amount'=> 0
         ]);
 
         $this->assertMatchesRegularExpression('/^\/\w+\/products\/\d+$/', $response->toArray()['@id']);
@@ -60,9 +64,9 @@ class ProductsTest extends ApiTestCase
         $this->assertMatchesResourceItemJsonSchema(Product::class);
     }
 
-    public function testGetById(){
+    public function testGetByIdAsUser(){
 
-        static::createClient()->request(Request::METHOD_GET,'/api/products/2');
+        $this->createClientWithCredentials()->request(Request::METHOD_GET,'/api/products/2');
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
@@ -79,25 +83,27 @@ class ProductsTest extends ApiTestCase
 
     }
 
-    public function testPut(){
+    public function testPutAsUser(){
 
-        static::createClient()->request(Request::METHOD_PUT,'/api/products/2',[
+        $user = $this->getUser();
+
+        $this->createClientWithCredentials()->request(Request::METHOD_PUT,'/api/products/' . $user->brand->products[1]->getId(),[
             'json'=>[
-                "name"=> "BANAN",
-                "brand"=> "/api/brands/4"
+                'name'=> 'HooliPhone(poop)',
+                'brand'=> '/api/brands/' . $user->brand->getId()
             ]
         ]);
 
         $this->assertJsonContains([
-            "@context"=>"/api/contexts/Product",
-            "@id"=> "/api/products/2",
-            "@type"=> "Product",
-            "name"=> "BANAN",
-            "brand"=> [
-                "@id"=> "/api/brands/4",
-                "@type"=> "Brand"
+            '@context'=>'/api/contexts/Product',
+            '@id'=> '/api/products/' . $user->brand->products[1]->getId(),
+            '@type'=>'Product',
+            'name'=> 'HooliPhone(poop)',
+            'brand'=> [
+                '@id'=> '/api/brands/' . $user->brand->getId(),
+                '@type'=> 'Brand'
             ],
-            "id"=>2
+            'id'=>$user->brand->products[1]->getId()
         ]);
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -106,12 +112,123 @@ class ProductsTest extends ApiTestCase
 
     }
 
+    public function testDeleteAsUser(){
+
+        $user = $this->getUser();
+
+        $this->createClientWithCredentials()->request(Request::METHOD_DELETE,'/api/products/' . $user->brand->products[1]->getId());
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
+
+    }
+
+    public function testGetCollection(){
+
+        static::createClient()->request(Request::METHOD_GET,'/api/products');
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+
+        $this->assertJsonContains([
+            'code'=> 401,
+            'message'=> 'JWT Token not found'
+        ]);
+    }
+
+    public function testGetById(){
+
+        static::createClient()->request(Request::METHOD_GET,'/api/products/2');
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+
+        $this->assertJsonContains([
+            'code'=> 401,
+            'message'=> 'JWT Token not found'
+        ]);
+    }
+
+    public function testCreate(){
+
+        static::createClient()->request(Request::METHOD_POST,'/api/products',[
+            'json'=>[
+                'name'=> 'testCreate',
+                'brand'=> '/api/brands/2',
+                'price'=> 0,
+                'visible'=> true,
+                'amount'=> 0,
+            ]
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+
+        $this->assertJsonContains([
+            'code'=> 401,
+            'message'=> 'JWT Token not found'
+        ]);
+
+    }
+
+    public function testPut(){
+
+        static::createClient()->request(Request::METHOD_PUT,'/api/products/2',[
+            'json'=>[
+                'name'=> 'testCreate',
+
+            ]
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+
+        $this->assertJsonContains([
+            'code'=> 401,
+            'message'=> 'JWT Token not found'
+        ]);
+
+    }
 
     public function testDelete(){
 
         static::createClient()->request(Request::METHOD_DELETE,'/api/products/2');
 
-        $this->assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+
+        $this->assertJsonContains([
+            'code'=> 401,
+            'message'=> 'JWT Token not found'
+        ]);
+
+    }
+
+    public function testPutAlien(){
+
+        $user = $this->getUser();
+        $token = $this->getToken([
+            'email'=>'noBrand@test.com',
+            'password'=>'test'
+        ]);
+
+        $this->createClientWithCredentials($token)->request(Request::METHOD_PUT,'/api/products/' . $user->brand->products[1]->getId(),[
+            'json'=>[
+                'name'=> 'testCreate',
+
+            ]
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+
+    }
+
+    public function testDeleteAlien(){
+
+        $user = $this->getUser();
+
+        $token = $this->getToken([
+            'email'=>'noBrand@test.com',
+            'password'=>'test'
+        ]);
+
+        $this->createClientWithCredentials($token)->request(Request::METHOD_DELETE,'/api/products/' . $user->brand->products[1]->getId());
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
 
     }
 }

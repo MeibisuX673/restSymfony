@@ -5,9 +5,16 @@ App\Entity\User:
     lastName: 'X673'
     password: 'test'
 
+  user_noBrand:
+    email: 'noBrand@test.com'
+    firstName: 'Meibisu'
+    lastName: 'X673'
+    password: 'test'
+
+
 App\Entity\Brand:
   brand_test:
-    name: 'Holli'
+    name: 'Hooli'
     user: '@user_test'
 
 App\Entity\Product:
