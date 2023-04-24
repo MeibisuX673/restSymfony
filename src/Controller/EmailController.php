@@ -2,17 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Service\MailerService;
-
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
+#[AsController]
 class EmailController  extends AbstractController
 {
 
@@ -24,10 +20,9 @@ class EmailController  extends AbstractController
     {
     }
 
-    #[Route(path: '/email',name: 'email_send')]
-    public function sendEmail(): Response{
 
-        // dd($this->security->getUser());
+    public function __invoke(User $user): User{
+
         $email = [
             'from'=>'test@test.com',
             'to'=>'test2@test.com',
@@ -37,9 +32,7 @@ class EmailController  extends AbstractController
 
         $this->mailerService->sendMail($email);
 
-        return new jsonResponse([
-            'message'=>'send'
-        ]);
+        return $user;
     }
 
 }

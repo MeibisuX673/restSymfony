@@ -8,6 +8,8 @@
 /public/media/*
 /var/
 /docker/database
+/private.key
+/public.key
 ###< symfony/framework-bundle ###
 
 ###> phpunit/phpunit ###

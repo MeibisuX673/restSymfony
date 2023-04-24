@@ -1,15 +1,32 @@
 league_oauth2_server:
     authorization_server:
         private_key: '%env(resolve:OAUTH_PRIVATE_KEY)%'
-        private_key_passphrase: '%env(resolve:OAUTH_PASSPHRASE)%'
+        private_key_passphrase: '%env(resolve:OAUTH_PRIVATE_KEY_PASS)%'
         encryption_key: '%env(resolve:OAUTH_ENCRYPTION_KEY)%'
+
+
+        enable_client_credentials_grant: true
+
+        enable_password_grant: true
+
+        enable_refresh_token_grant: true
+
+        enable_auth_code_grant: false
+
+    role_prefix: ROLE_
+
     resource_server:
         public_key: '%env(resolve:OAUTH_PUBLIC_KEY)%'
     scopes:
-        available: ['email']
-        default: ['email']
+        available: ['ROLE_USER']
+        default: ['ROLE_USER']
     persistence:
-        doctrine: null
+        doctrine:
+            entity_manager: default
+
+    client:
+        # Set a custom client class. Must be a League\Bundle\OAuth2ServerBundle\Model\Client
+        classname:        League\Bundle\OAuth2ServerBundle\Model\Client
 
 when@test:
     league_oauth2_server:

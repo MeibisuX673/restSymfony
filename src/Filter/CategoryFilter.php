@@ -31,6 +31,7 @@ final class CategoryFilter extends AbstractFilter
         }
 
         $category = $context['filters'][self::FILTER_NAME];
+
         $category = mb_strtolower($category);
 
         if (!in_array($category, $this->categories)) {

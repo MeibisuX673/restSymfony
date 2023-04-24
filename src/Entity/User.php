@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\Controller\EmailController;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -21,8 +22,10 @@ use Symfony\Component\Validator\Constraints AS Assert;
     denormalizationContext: ['groups'=>[self::SET_USER]]
 )]
 #[Patch(security: "object === user", securityMessage: 'У вас нет прав')]
-#[Post()]
-#[Put(security: "object === user", securityMessage: 'У вас нет прав')]
+#[Post(
+    controller: EmailController::class
+)]
+#[Put(security: "is_granted('ROLE_USER') or object === user", securityMessage: 'У вас нет прав')]
 #[GetCollection]
 #[Get]
 #[Delete(security: "object === user", securityMessage: 'У вас нет прав')]
@@ -42,6 +45,10 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     #[ORM\Column(type: Types::STRING, unique: true, nullable: false)]
     #[Groups([self::GET_ONE_USER,self::SET_USER])]
     private string $email;
+
+    #[Groups([self::GET_ONE_USER,self::SET_USER])]
+    #[ORM\Column(type: Types::STRING, unique: true, nullable: false)]
+    public string $username;
 
     #[Assert\NotNull]
     #[Assert\NotBlank]

@@ -6,7 +6,6 @@ use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
-use \Symfony\Component\Validator\Constraints AS Assert;
 
 
 class BaseEntity
@@ -34,13 +33,15 @@ class BaseEntity
     }
 
     #[ORM\PrePersist]
-    public function setCreatedAtValue(){
+    public function setCreatedAtValue(): void
+    {
         $this->dateCreate = new DateTime('now');
         $this->dateUpdate = new DateTime('now');
     }
 
     #[ORM\PreUpdate]
-    public function setDateUpdate(){
+    public function setDateUpdate(): void
+    {
         $this->dateUpdate = new DateTime('now');
     }
 

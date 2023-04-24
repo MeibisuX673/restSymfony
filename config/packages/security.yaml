@@ -21,19 +21,21 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        api:
-            pattern: ^/api/
+
+        api_token:
+            pattern: ^/api/token$
+            security: false
+#        api:
+#            pattern: ^/api
+#            security: true
+#            stateless: true
+#            auth2: true
+        api_oauth:
+            pattern: ^/api
+            security: true
             stateless: true
             provider: app_user_provider
-            jwt: ~
-        main:
-            json_login:
-                check_path: auth
-                username_path: email
-                password_path: password
-                success_handler: lexik_jwt_authentication.handler.authentication_success
-                failure_handler: lexik_jwt_authentication.handler.authentication_failure
-
+            oauth2: true
 
             #            entry_point: form_login
 #            remember_me:
@@ -72,7 +74,7 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/authorize, roles: IS_AUTHENTICATED_REMEMBERED }
+        - { path: ^/authorize, roles: PUBLIC_ACCESS }
         - { path: ^/api/users$, roles: PUBLIC_ACCESS, methods: [POST]}
         - { path: ^/media, roles: PUBLIC_ACCESS }
         - { path: ^/media, roles: IS_AUTHENTICATED_FULLY, methods: [POST, PUT, PATCH, DELETE] }

@@ -12,23 +12,20 @@ api_platform:
     # To enable or disable OAuth.
     enabled: true
 
-    # The OAuth client ID.
-    clientId: ''
-
-    # The OAuth client secret.
-    clientSecret: ''
-
     # The OAuth type.
     type: 'oauth2'
 
     # The OAuth flow grant type.
-    flow: 'application'
+    flow: 'password'
 
     # The OAuth token URL. Make sure to check the specification tokenUrl is not needed for an implicit flow.
-    tokenUrl: ''
+    tokenUrl: 'http://localhost/token'
 
-    # The OAuth authentication URL.
-    authorizationUrl: ''
+#    scopes: ['ROLE_USER']
 
-    # The OAuth scopes.
-    scopes: [ ]
+#    authorizationUrl: 'http://localhost/authorize'
+
+    clientId: ''
+    clientSecret: ''
+
+
