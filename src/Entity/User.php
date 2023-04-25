@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Put;
 use App\Controller\EmailController;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use League\OAuth2\Server\Entities\UserEntityInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -25,7 +26,7 @@ use Symfony\Component\Validator\Constraints AS Assert;
 #[Post(
     controller: EmailController::class
 )]
-#[Put(security: "is_granted('ROLE_USER') or object === user", securityMessage: 'У вас нет прав')]
+#[Put(security: "object === user", securityMessage: 'У вас нет прав')]
 #[GetCollection]
 #[Get]
 #[Delete(security: "object === user", securityMessage: 'У вас нет прав')]
@@ -45,10 +46,6 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
     #[ORM\Column(type: Types::STRING, unique: true, nullable: false)]
     #[Groups([self::GET_ONE_USER,self::SET_USER])]
     private string $email;
-
-    #[Groups([self::GET_ONE_USER,self::SET_USER])]
-    #[ORM\Column(type: Types::STRING, unique: true, nullable: false)]
-    public string $username;
 
     #[Assert\NotNull]
     #[Assert\NotBlank]
@@ -123,4 +120,7 @@ class User extends BaseEntity implements UserInterface, PasswordAuthenticatedUse
         $this->password = $password;
         return $this;
     }
+
+
+
 }

@@ -2,11 +2,11 @@ api_platform:
   defaults:
     pagination_items_per_page: 12
     pagination_maximum_items_per_page: 12
-  swagger:
-    api_keys:
-      JWT:
-        name: Authorization
-        type: header
+#  swagger:
+#    api_keys:
+#      JWT:
+#        name: Authorization
+#        type: header
 
   oauth:
     # To enable or disable OAuth.

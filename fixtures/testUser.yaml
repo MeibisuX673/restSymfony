@@ -1,14 +1,12 @@
 App\Entity\User:
   user_test:
     email: 'test@test.com'
-    username: 'test'
     firstName: 'Meibisu'
     lastName: 'X673'
     password: 'test'
 
   user_noBrand:
     email: 'noBrand@test.com'
-    username: 'test2'
     firstName: 'Meibisu'
     lastName: 'X673'
     password: 'test'
